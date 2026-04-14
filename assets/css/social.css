@@ -1,22 +1,25 @@
 /* 社交气泡独立定位 */
 .social-bubble {
-    position: fixed;
-    bottom: 12%;          /* 根据视觉调整，放在文字下方 */
+    position: absolute;
+    top: 70vh;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 41;          /* 略高于文字层，但低于光标（光标 z-index 更高） */
+    z-index: 41;
     background-color: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(8px);
     border-radius: 60px;
-    padding: 0.8rem 1.5rem;
+    padding: 0.5rem 1rem;
     display: flex;
-    gap: 1.8rem;
+    flex-wrap: nowrap;
+    gap: 1rem;
     justify-content: center;
     align-items: center;
+    height: auto;
+    max-width: max-content;
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: all 0.2s ease;
-    pointer-events: auto;     /* 允许点击 */
-    /* 黑色半调网格小点 */
+    pointer-events: auto;
+
     background-image: repeating-radial-gradient(
         circle at 2px 2px,
         rgba(0, 0, 0, 0.9) 0px,
