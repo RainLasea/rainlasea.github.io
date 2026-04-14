@@ -1,0 +1,64 @@
+/* 社交气泡独立定位 */
+.social-bubble {
+    position: fixed;
+    bottom: 12%;          /* 根据视觉调整，放在文字下方 */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 41;          /* 略高于文字层，但低于光标（光标 z-index 更高） */
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    border-radius: 60px;
+    padding: 0.8rem 1.5rem;
+    display: flex;
+    gap: 1.8rem;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+    pointer-events: auto;     /* 允许点击 */
+    /* 黑色半调网格小点 */
+    background-image: repeating-radial-gradient(
+        circle at 2px 2px,
+        rgba(0, 0, 0, 0.9) 0px,
+        rgba(0, 0, 0, 0.9) 2px,
+        transparent 2px,
+        transparent 8px
+    );
+    background-blend-mode: normal;
+    background-repeat: repeat;
+    background-size: 10px 10px;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, opacity 0.2s;
+    opacity: 0.85;
+}
+
+.social-icon:hover {
+    transform: translateY(-3px);
+    opacity: 1;
+}
+
+.social-icon svg {
+    width: 26px;
+    height: 26px;
+    fill: #ffffff;
+    transition: fill 0.2s;
+    pointer-events: none;
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+    .social-bubble {
+        bottom: 8%;
+        gap: 1.2rem;
+        padding: 0.6rem 1.2rem;
+    }
+    .social-icon svg {
+        width: 22px;
+        height: 22px;
+    }
+}

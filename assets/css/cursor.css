@@ -1,0 +1,41 @@
+/* ===== 全局隐藏默认光标 ===== */
+* {
+    cursor: none !important;
+}
+
+/* ===== 自定义光标 ===== */
+#cursor {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    background: #f7f0ff;
+    border-radius: 8px;
+    opacity: 0.35;
+    z-index: 99999998;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: 0.2s ease-in-out;
+    transition-property: background, opacity, transform;
+    box-shadow: 0 0 6px rgba(255,255,200,0.6);
+}
+
+#cursor-dot {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background: #fff9e8;
+    border-radius: 999px;
+    z-index: 99999999;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease-in-out;
+    filter: blur(0.5px);
+}
+
+#cursor.hidden, #cursor-dot.hidden { opacity: 0; }
+#cursor.hover { transform: translate(-50%, -50%) scale(1.5); opacity: 0.6; background: #ffdfb3; }
+#cursor.active { transform: translate(-50%, -50%) scale(0.8); opacity: 0.45; background: #ffe0a3; }

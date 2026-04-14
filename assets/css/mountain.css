@@ -1,0 +1,173 @@
+/* ===== 全局重置 & 背景 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #2b1e3a 0%, #4a3a6e 40%, #7d6b9b 100%);
+    overflow-x: hidden;
+    font-family: 'Courier New', monospace;
+    position: relative;
+}
+
+/* ===== 星空层 ===== */
+.stars-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+.star {
+    position: absolute;
+    background: radial-gradient(circle, #fff, rgba(255,245,210,0.8));
+    border-radius: 50%;
+    opacity: 0;
+    animation: starFade 4s infinite alternate;
+}
+@keyframes starFade {
+    0% { opacity: 0.1; transform: scale(0.8); }
+    100% { opacity: 0.9; transform: scale(1.2); }
+}
+
+/* ===== 云层 ===== */
+.cloud {
+    position: absolute;
+    background: rgba(255, 248, 225, 0.45);
+    border-radius: 80% 20% 70% 30% / 60% 50% 50% 40%;
+    filter: blur(8px);
+    z-index: 1;
+    pointer-events: none;
+    animation: driftCloud linear infinite;
+}
+@keyframes driftCloud {
+    0% { transform: translateX(-20vw); }
+    100% { transform: translateX(120vw); }
+}
+
+/* ===== 山脉场景 ===== */
+.mountain-scene {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70vh;
+    z-index: 2;
+    pointer-events: none;
+}
+.range-back {
+    position: absolute;
+    bottom: 0;
+    left: -5%;
+    width: 110%;
+    height: 100%;
+    background: linear-gradient(120deg, #5f5080, #3f2e5a);
+    clip-path: polygon(0% 100%, 0% 65%, 12% 40%, 28% 62%, 42% 28%, 58% 55%, 74% 35%, 88% 58%, 100% 42%, 100% 100%);
+    opacity: 0.7;
+    transition: transform 0.1s ease-out;
+    z-index: 1;
+}
+.front-range {
+    position: absolute;
+    bottom: 0;
+    left: -5%;
+    width: 110%;
+    height: 100%;
+    transition: transform 0.1s ease-out;
+    z-index: 3;
+}
+.peak-main {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #1e132f 0%, #2c1d44 60%, #19102b 100%);
+    clip-path: polygon(0% 100%, 0% 72%, 8% 58%, 18% 68%, 28% 48%, 38% 62%, 50% 18%, 62% 52%, 72% 38%, 84% 56%, 92% 44%, 100% 62%, 100% 100%);
+    box-shadow: inset 0 15px 20px rgba(0,0,0,0.3);
+}
+.peak-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: inherit;
+    background: radial-gradient(ellipse 70% 60% at 50% 18%, #ffffff 0%, #fff9f0 20%, #f2eaff 45%, rgba(210, 190, 230, 0.4) 70%, transparent 95%);
+    pointer-events: none;
+}
+.peak-main::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: inherit;
+    background: linear-gradient(125deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 30%, transparent 70%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+}
+
+/* ===== 旗帜 ===== */
+.flag-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 18%;
+    transform: translate(-50%, -100%);
+    width: 36px;
+    height: 52px;
+    z-index: 15;
+    pointer-events: none;
+}
+.flag-pole {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 2.5px;
+    height: 100%;
+    background: #e7cf9e;
+    transform: translateX(-50%);
+    box-shadow: 0 0 3px #ffefb0;
+}
+.flag-cloth {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 24px;
+    height: 14px;
+    background: #f2554c;
+    transform: translateX(-2px);
+    clip-path: polygon(0% 0%, 100% 0%, 85% 55%, 100% 100%, 0% 100%);
+    animation: flagFlap 0.9s ease-in-out infinite alternate;
+    transform-origin: left center;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+}
+@keyframes flagFlap {
+    0% { transform: translateX(-2px) skewY(-2deg) scaleX(0.98); }
+    100% { transform: translateX(-2px) skewY(3deg) scaleX(1.02); }
+}
+
+/* ===== 雾气 ===== */
+.mist {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(0deg, rgba(30,20,50,0.5), transparent);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* ===== 响应式（仅山脉与旗帜） ===== */
+@media (max-width: 600px) {
+    .flag-wrapper { width: 28px; height: 42px; }
+    .flag-cloth { width: 20px; height: 12px; }
+}
