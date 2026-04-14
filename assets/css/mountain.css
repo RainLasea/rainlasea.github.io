@@ -27,7 +27,7 @@ html {
 
 body {
     min-height: 180vh;
-    background: linear-gradient(180deg, #2b1e3a 0%, #4a3a6e 40%, #7d6b9b 50%, #19102b 40%);
+    background: linear-gradient(180deg, #2b1e3a 0%, #4a3a6e 30%, #341d58 50%, #19102b 70%, #19102b 100%);
     overflow-x: hidden;
     font-family: 'Courier New', monospace;
     position: relative;
@@ -473,6 +473,104 @@ body {
 @media (max-width: 600px) {
     .site-footer-area {
         padding: 30px 15px;
+    }
+}
+
+/* 平板设备 (1024px 及以下) */
+@media (max-width: 1024px) {
+    .mountain-scene {
+        top: 300px;
+        height: 600px;
+    }
+    .profile-card {
+        margin: 150px auto 0;
+        padding: 60px 20px;
+    }
+    .avatar {
+        width: 120px;
+        height: 120px;
+    }
+    .name-line {
+        font-size: 1.8rem;
+    }
+    .friend-avatar {
+        width: 75px;
+        height: 75px;
+    }
+    .friend-name {
+        font-size: 1.4rem;
+    }
+}
+
+/* 小平板/大手机 (768px 及以下) */
+@media (max-width: 768px) {
+    .mountain-scene {
+        top: 250px;
+        height: 550px;
+    }
+    .profile-card {
+        margin: 120px auto 0;
+        padding: 50px 18px;
+    }
+    .avatar {
+        width: 110px;
+        height: 110px;
+    }
+    .name-line {
+        font-size: 1.6rem;
+    }
+    .bio {
+        font-size: 0.95rem;
+    }
+    .friend-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    .friend-name {
+        font-size: 1.3rem;
+    }
+    .friends-list {
+        gap: 20px;
+    }
+}
+
+/* 小手机 (480px 及以下) */
+@media (max-width: 480px) {
+    .mountain-scene {
+        top: 200px;
+        height: 600px;
+    }
+    .profile-card {
+        margin: 100px auto 0;
+        padding: 30px 15px;
+    }
+    .avatar {
+        width: 100px;
+        height: 100px;
+    }
+    .name-line {
+        font-size: 1.4rem;
+    }
+    .bio {
+        font-size: 0.9rem;
+    }
+    .friend-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    .friend-name {
+        font-size: 1.1rem;
+    }
+    .friend-desc {
+        font-size: 0.85rem;
+    }
+    .friends-list {
+        gap: 18px;
+    }
+    .social-bubble {
+        padding: 4px 1rem;
+        gap: 1rem;
+        border-radius: 30px;
     }
 }
 
