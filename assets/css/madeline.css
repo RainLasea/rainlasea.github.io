@@ -1,4 +1,3 @@
-/* ===== 3D 画布容器 ===== */
 .canvas-container {
     position: absolute;
     left: 50%;
@@ -14,7 +13,6 @@ canvas {
     cursor: move;
 }
 
-/* ===== 响应式调整 ===== */
 @media (max-width: 600px) {
     .canvas-container {
         top: calc(18% - 60px);

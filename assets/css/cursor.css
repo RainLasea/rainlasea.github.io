@@ -1,9 +1,7 @@
-/* ===== 全局隐藏默认光标 ===== */
 * {
     cursor: none !important;
 }
 
-/* ===== 自定义光标 ===== */
 #cursor {
     position: fixed;
     left: 0;
