@@ -1,0 +1,246 @@
+/* Game Boy decoration based on the provided classic layout */
+
+.gameboy-container,
+.gameboy-container * {
+  box-sizing: border-box;
+}
+
+.gameboy-container {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  left: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  display: block !important;
+  transform: none !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  isolation: isolate;
+}
+
+.gameboy {
+  width: 100px;
+  height: 165px;
+  background-color: #e0e2e3;
+  border-radius: 5px;
+  border-bottom-right-radius: 20px;
+  margin: 0;
+  padding: 10px;
+  position: relative;
+  box-shadow: 0 0 40px 1px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.gameboy::after {
+  content: "";
+  display: block;
+  width: 17.5%;
+  height: 12.5%;
+  right: 12.5%;
+  bottom: 6%;
+  position: absolute;
+  transform: rotate(45deg);
+  background-color: #b6bbbf;
+  background: linear-gradient(#b6bbbf 50%, transparent 50%);
+  background-size: 20%;
+}
+
+.gameboy .display {
+  width: 100%;
+  height: 50%;
+  border-radius: 5px;
+  border-bottom-right-radius: 20px;
+  background-color: #495b66;
+  padding: 10px 12.5px;
+  display: block;
+  position: relative;
+  transition: background-color 0.25s ease, filter 0.25s ease;
+}
+
+.gameboy .display .light {
+  background-color: #bc4374;
+  border-radius: 50%;
+  width: 4%;
+  height: 4%;
+  position: absolute;
+  left: 6%;
+  top: 30%;
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.gameboy .display .screen {
+  width: 100%;
+  height: 100%;
+  background-color: #55af7e;
+  overflow: hidden;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+.gameboy .display .screen svg {
+  width: 100%;
+  height: 15%;
+  fill: #2d5a44;
+  margin: 34% 4% 0;
+  display: block;
+  transition: transform 0.25s ease, opacity 0.25s ease, filter 0.25s ease;
+}
+
+.gameboy .dpad {
+  width: 35%;
+  height: 3.5%;
+  margin: 25% 0 7% 12%;
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  list-style: none;
+  padding: 0;
+}
+
+.gameboy .dpad li {
+  background-color: #393e43;
+  border-radius: 3px;
+  width: 40%;
+  height: 235%;
+  display: inline-block;
+  margin: 0 -5%;
+  transition: background-color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.gameboy .dpad li:first-child,
+.gameboy .dpad li:last-child {
+  display: block;
+  margin: -7.5% 0;
+}
+
+.gameboy .dpad li:first-child {
+  margin-bottom: -17.5%;
+}
+
+.gameboy .dpad li:last-child {
+  margin-top: -18%;
+}
+
+.gameboy .dpad li:nth-child(2) {
+  margin: 0 30% 0 -30%;
+}
+
+.gameboy .dpad::after {
+  content: "";
+  display: block;
+  width: 37.5%;
+  height: 225%;
+  position: absolute;
+  background-color: #393e43;
+  top: 140%;
+  left: 3%;
+  z-index: 99;
+  transition: background-color 0.2s ease, filter 0.2s ease;
+}
+
+.gameboy .startselect {
+  width: 35%;
+  display: inline-block;
+  height: 5%;
+  margin: 60% -12.5% 0 -17.5%;
+  vertical-align: top;
+  list-style: none;
+  padding: 0;
+}
+
+.gameboy .startselect li {
+  background-color: #5a6b7a;
+  width: 50%;
+  height: 50%;
+  display: inline-block;
+  transform: rotate(145deg);
+  transition: background-color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.gameboy .buttons {
+  width: 45%;
+  height: 12.5%;
+  margin: 27.5% -2.5% 0 5%;
+  display: inline-block;
+  background-color: #b6bbbf;
+  transform: rotate(135deg);
+  border-radius: 10px;
+  list-style: none;
+  padding: 0;
+  transition: background-color 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+}
+
+.gameboy .buttons li {
+  width: 30%;
+  height: 60%;
+  margin: 10%;
+  background-color: #bc4374;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+
+.gameboy:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 44px 2px rgba(0, 0, 0, 0.58);
+}
+
+.gameboy:hover .display {
+  background-color: #41515a;
+}
+
+.gameboy:hover .display .light {
+  background-color: #ff6b98;
+  box-shadow: 0 0 10px rgba(255, 107, 152, 0.75);
+  transform: scale(1.08);
+}
+
+.gameboy:hover .display .screen {
+  background-color: #62ba8a;
+  filter: saturate(1.08) brightness(1.03);
+}
+
+.gameboy:hover .display .screen svg {
+  filter: drop-shadow(0 0 4px rgba(45, 90, 68, 0.18));
+  transform: translateY(-1px);
+}
+
+.gameboy:hover .dpad li,
+.gameboy:hover .startselect li,
+.gameboy:hover .buttons li {
+  filter: brightness(1.08);
+}
+
+.gameboy:hover .dpad li {
+  background-color: #454b50;
+}
+
+.gameboy:hover .dpad::after {
+  background-color: #454b50;
+}
+
+.gameboy:hover .startselect li {
+  background-color: #667688;
+}
+
+.gameboy:hover .buttons {
+  background-color: #c4c9cd;
+}
+
+.gameboy:hover .buttons li {
+  background-color: #d45f85;
+}
+
+.gameboy .dpad li:hover,
+.gameboy .startselect li:hover,
+.gameboy .buttons li:hover {
+  transform: scale(1.05);
+}
+
+.gameboy .display .screen svg {
+    width: 60% !important;
+    height: auto !important;
+    margin: 20% auto 0 !important;
+    display: block !important;
+}

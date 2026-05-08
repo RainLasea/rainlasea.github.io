@@ -44,4 +44,41 @@
             applyParallax(lastMouseX, lastMouseY);
         });
     }
+
+    // Keep the Game Boy pinned to the viewport's top-right corner.
+    function fixGameboyPosition() {
+        const gameboy = document.getElementById('gameboyBtn');
+        if (!gameboy) return;
+
+        if (gameboy.parentElement !== document.body) {
+            document.body.appendChild(gameboy);
+        }
+
+        gameboy.style.setProperty('position', 'fixed', 'important');
+        gameboy.style.setProperty('top', '20px', 'important');
+        gameboy.style.setProperty('right', '20px', 'important');
+        gameboy.style.setProperty('left', 'auto', 'important');
+        gameboy.style.setProperty('bottom', 'auto', 'important');
+        gameboy.style.setProperty('margin', '0', 'important');
+        gameboy.style.setProperty('transform', 'none', 'important');
+        gameboy.style.setProperty('z-index', '2147483647', 'important');
+        gameboy.style.setProperty('display', 'block', 'important');
+        gameboy.style.setProperty('pointer-events', 'auto', 'important');
+    }
+
+    fixGameboyPosition();
+
+    const gameboyObserver = new MutationObserver(() => {
+        fixGameboyPosition();
+    });
+
+    gameboyObserver.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style']
+    });
+
+    window.addEventListener('resize', fixGameboyPosition, { passive: true });
+    window.addEventListener('load', fixGameboyPosition);
 })();
