@@ -52,6 +52,12 @@
         opacity: 0;
     }
 
+    #cursor.near-bottom-edge,
+    #cursor-dot.near-bottom-edge {
+        opacity: 0;
+        transition: none;
+    }
+
     #cursor.hover::before {
         background: rgba(242, 199, 128, 0.24);
         transform: scale(1.65);

@@ -113,6 +113,9 @@
         input.x = event.clientX;
         input.y = event.clientY;
         pointerTarget = event.target;
+        const nearBottomEdge = event.clientY >= window.innerHeight - 14;
+        if (cursor) cursor.classList.toggle('near-bottom-edge', nearBottomEdge);
+        if (cursorDot) cursorDot.classList.toggle('near-bottom-edge', nearBottomEdge);
 
         if (!input.ready) {
             input.ready = true;

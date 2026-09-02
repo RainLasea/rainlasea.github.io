@@ -11,11 +11,11 @@
         const renderParallax = () => {
             frame = 0;
             root.style.setProperty('--far-x', `${(-targetX * 7).toFixed(2)}px`);
-            root.style.setProperty('--far-y', `${(-targetY * 3).toFixed(2)}px`);
+            root.style.setProperty('--far-y', `${(3 - targetY * 3).toFixed(2)}px`);
             root.style.setProperty('--mid-x', `${(-targetX * 13).toFixed(2)}px`);
-            root.style.setProperty('--mid-y', `${(-targetY * 5).toFixed(2)}px`);
+            root.style.setProperty('--mid-y', `${(5 - targetY * 5).toFixed(2)}px`);
             root.style.setProperty('--front-x', `${(-targetX * 20).toFixed(2)}px`);
-            root.style.setProperty('--front-y', `${(-targetY * 7).toFixed(2)}px`);
+            root.style.setProperty('--front-y', `${(7 - targetY * 7).toFixed(2)}px`);
         };
 
         window.addEventListener('pointermove', (event) => {

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/css/cursor.css">
     <script src="assets/js/i18n.js" defer></script>
     <script src="assets/js/style.js" defer></script>
+    <script src="assets/js/windows.js" defer></script>
     <script src="assets/js/snow.js" defer></script>
     <script src="assets/js/cursor.js" defer></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/hover-tilt@1.0.0/dist/hover-tilt.js"></script>
@@ -20,7 +21,7 @@
         <section class="mountain-page" aria-labelledby="hero-title">
             <div class="hero">
     <header class="site-header">
-        <nav class="link-dock" aria-label="个人主页链接" data-i18n-aria-label="nav.label">
+        <nav class="link-dock" id="profile-links" aria-label="个人主页链接" data-i18n-aria-label="nav.label">
             <a class="dock-link" href="https://github.com/RainLasea" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.26.82-.58 0-.287-.01-1.05-.015-2.06-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.082-.73.082-.73 1.205.085 1.838 1.237 1.838 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.236-3.22-.124-.3-.536-1.52.117-3.16 0 0 1.008-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.29-1.552 3.297-1.23 3.297-1.23.653 1.64.241 2.86.118 3.16.768.84 1.236 1.91 1.236 3.22 0 4.61-2.804 5.62-5.476 5.92.43.37.824 1.102.824 2.22 0 1.602-.015 2.894-.015 3.287 0 .322.216.698.83.578C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/></svg>
                 <span>GitHub</span>
@@ -136,43 +137,137 @@
             </div>
         </section>
 
-        <div class="content-area">
-            <hover-tilt class="about-tilt reveal" tilt-factor="0.75" tilt-factor-y="0.55" scale-factor="1.018" glare-intensity="0.58" glare-hue="195" blend-mode="normal" shadow shadow-blur="34" exit-delay="90">
-                <section class="about-card" id="about" aria-labelledby="about-title">
-                    <a class="avatar-link" href="https://space.bilibili.com/186766276" target="_blank" rel="noopener noreferrer" aria-label="访问 AbyssLasea 的 Bilibili 主页" data-i18n-aria-label="about.linkLabel"><img class="avatar" src="https://q.qlogo.cn/headimg_dl?dst_uin=1178391318&amp;spec=640&amp;img_type=jpg" alt="AbyssLasea 的头像" data-i18n-alt="about.avatarAlt"></a>
-                    <div class="about-copy">
-                        <p class="section-kicker" data-i18n="about.kicker">关于我</p>
-                        <h2 id="about-title"><span class="about-greeting" data-i18n="about.greeting">你好，我是</span> <span class="about-name">AbyssLasea</span></h2>
-                        <p class="lead" data-i18n="about.lead">自称是 Game Developer 的人。</p>
-                        <p data-i18n="about.body">我制作 Game Mod 和一些 Mini Game，最近正在使用 Godot 引擎制作 3D Game。多多期待！</p>
+        <section class="content-area" id="about" data-page-window aria-labelledby="desktop-title">
+            <header class="content-window-titlebar" data-page-window-drag tabindex="0" aria-label="拖动首页窗口" data-i18n-aria-label="window.dragHome">
+                <div class="window-title"><span id="desktop-title" data-i18n="desktop-title">首页</span></div>
+                <div class="content-window-tools">
+                    <button class="window-reset" type="button" data-page-window-reset aria-label="还原首页窗口位置" data-i18n-aria-label="window.resetHome">↺</button>
+                </div>
+            </header>
+
+            <div class="content-window-body">
+                <section class="window-main" aria-labelledby="home-heading">
+                    <div class="home-intro" id="profile-intro">
+                        <h2 id="home-heading"><span data-i18n="home.greeting">hi! i'm</span> <strong>AbyssLasea</strong></h2>
+                        <p class="home-role" data-i18n="home.role">游戏开发者以及绘画新手</p>
+                    </div>
+
+                    <nav class="home-apps" aria-label="首页导航" data-i18n-aria-label="home.navLabel">
+                        <button class="home-app home-app-about" type="button" data-open-page-window="about-window" aria-controls="about-window">
+                            <img class="home-app-icon" src="https://api.iconify.design/lucide:user.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
+                            <span data-i18n="home.about">关于</span>
+                        </button>
+                        <a class="home-app home-app-links" href="#profile-links">
+                            <img class="home-app-icon" src="https://api.iconify.design/lucide:link.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
+                            <span data-i18n="home.links">链接</span>
+                        </a>
+                        <button class="home-app home-app-work" type="button" data-open-page-window="work-window" aria-controls="work-window">
+                            <img class="home-app-icon" src="https://api.iconify.design/lucide:folder.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
+                            <span data-i18n="home.work">作品</span>
+                        </button>
+                        <!-- FAQ 暂时隐藏
+                        <a class="home-app home-app-faq" href="#profile-intro">
+                            <img class="home-app-icon" src="https://api.iconify.design/lucide:circle-help.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
+                            <span data-i18n="home.faq">FAQ</span>
+                        </a>
+                        -->
+                        <a class="home-app home-app-contact" href="mailto:1178391318@qq.com">
+                            <img class="home-app-icon" src="https://api.iconify.design/lucide:message-circle.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
+                            <span data-i18n="home.contact">联系方式</span>
+                        </a>
+                    </nav>
+                </section>
+            </div>
+        </section>
+
+        <section class="content-area about-page-window" id="about-window" data-page-window data-secondary-window aria-labelledby="about-window-title" aria-hidden="true">
+            <header class="content-window-titlebar" data-page-window-drag tabindex="0" aria-label="拖动关于窗口" data-i18n-aria-label="window.dragAbout">
+                <div class="window-title"><span id="about-window-title" data-i18n="about.windowTitle">关于</span></div>
+                <div class="content-window-tools">
+                    <button class="window-reset" type="button" data-page-window-reset aria-label="还原关于窗口位置" data-i18n-aria-label="window.resetAbout">↺</button>
+                    <button class="window-close" type="button" data-page-window-close aria-label="关闭关于窗口" data-i18n-aria-label="window.closeAbout">×</button>
+                </div>
+            </header>
+
+            <div class="content-window-body about-window-body">
+                <section class="about-summary" aria-labelledby="about-name">
+                    <a class="about-avatar-link" href="https://space.bilibili.com/186766276" target="_blank" rel="noopener noreferrer" aria-label="访问XuXiuHao的 Bilibili 主页" data-i18n-aria-label="about.linkLabel">
+                        <img class="about-profile-avatar" src="https://q.qlogo.cn/headimg_dl?dst_uin=1178391318&amp;spec=640&amp;img_type=jpg" alt="XuXiuHao的头像" data-i18n-alt="about.avatarAlt">
+                    </a>
+                    <div class="about-summary-copy">
+                        <h2 id="about-name" data-i18n="about.name">徐修昊</h2>
+                        <p data-i18n="about.summary">中国的游戏开发者，目前仍处于学生状态</p>
                     </div>
                 </section>
-            </hover-tilt>
 
-            <section class="friends-section" aria-labelledby="friends-title">
-                <div class="section-heading reveal"><div><h2 id="friends-title" data-i18n="friends.title">我的朋友</h2></div></div>
-                <div class="friends-grid">
-                    <hover-tilt class="friend-tilt reveal" tilt-factor="1.15" tilt-factor-y="0.9" scale-factor="1.045" glare-intensity="0.85" glare-hue="190" blend-mode="normal" shadow shadow-blur="28" exit-delay="80">
-                        <article class="friend-card">
-                            <a href="https://space.bilibili.com/29334224" target="_blank" rel="noopener noreferrer" aria-label="访问闪卡ShanKa的 Bilibili 主页" data-i18n-aria-label="friends.shankaLink"><img class="friend-avatar" src="https://q.qlogo.cn/headimg_dl?dst_uin=651997894&amp;spec=640&amp;img_type=jpg" alt="闪卡ShanKa 的头像" data-i18n-alt="friends.shankaAlt" loading="lazy"></a>
-                            <div class="friend-copy"><h3>闪卡ShanKa</h3><p class="friend-role" data-i18n="friends.shankaRole">游戏开发者 · SpeedRunner</p><p class="friend-note" data-i18n="friends.shankaNote">知识学爆 👍 · 暂时没有更多介绍（</p></div>
-                        </article>
-                    </hover-tilt>
-                    <hover-tilt class="friend-tilt reveal" tilt-factor="1.15" tilt-factor-y="0.9" scale-factor="1.045" glare-intensity="0.85" glare-hue="190" blend-mode="normal" shadow shadow-blur="28" exit-delay="80">
-                        <article class="friend-card">
-                            <a href="https://space.bilibili.com/1942331446" target="_blank" rel="noopener noreferrer" aria-label="访问滴答滴的 Bilibili 主页" data-i18n-aria-label="friends.didaLink"><img class="friend-avatar" src="https://q.qlogo.cn/headimg_dl?dst_uin=1344401848&amp;spec=640&amp;img_type=jpg" alt="滴答滴的头像" data-i18n-alt="friends.didaAlt" loading="lazy"></a>
-                            <div class="friend-copy"><h3>滴答滴</h3><p class="friend-role" data-i18n="friends.didaRole">24 岁，是学生</p><p class="friend-note" data-i18n="friends.didaNote">交友须带三分侠气，做人须存一点素心。</p></div>
-                        </article>
-                    </hover-tilt>
-                    <hover-tilt class="friend-tilt reveal" tilt-factor="1.15" tilt-factor-y="0.9" scale-factor="1.045" glare-intensity="0.85" glare-hue="190" blend-mode="normal" shadow shadow-blur="28" exit-delay="80">
-                        <article class="friend-card">
-                            <a href="https://space.bilibili.com/3186526" target="_blank" rel="noopener noreferrer" aria-label="访问 Lunatic 的 Bilibili 主页" data-i18n-aria-label="friends.lunaticLink"><img class="friend-avatar" src="https://q.qlogo.cn/headimg_dl?dst_uin=374778317&amp;spec=640&amp;img_type=jpg" alt="Lunatic 的头像" data-i18n-alt="friends.lunaticAlt" loading="lazy"></a>
-                            <div class="friend-copy"><h3>Lunatic</h3><p class="friend-role" data-i18n="friends.lunaticRole">300 英雄大手子</p><p class="friend-note" data-i18n="friends.lunaticNote">任务成瘾。</p></div>
-                        </article>
-                    </hover-tilt>
+                <section class="about-details markdown-content" aria-labelledby="about-details-title">
+                    <h3 id="about-details-title" data-i18n="about.detailsTitle">详细介绍</h3>
+                    <p data-i18n="about.detailsIntro">嗨！我是Lasea(网名同时也是我的OC名)，一名游戏开发者。我...</p>
+                    <ul>
+                        <li><a href="https://abysslasea.itch.io/" target="_blank" rel="noopener noreferrer" data-i18n="about.makesGames">制作"游戏"</a></li>
+                        <li data-i18n="about.makesSoftware">制作奇奇怪怪的软件(玩具)</li>
+                        <li><a href="https://x.com/AbyssLasea" target="_blank" rel="noopener noreferrer" data-i18n="about.makesArt">绘制时尚小垃圾(涂鸦)</a></li>
+                    </ul>
+
+                    <p class="about-contact"><span data-i18n="about.contactLead">如果你找我有事情亦或者想与我合作请发送邮件至</span> <a href="mailto:1178391318@qq.com">1178391318@qq.com</a> <span data-i18n="about.contactTail">:)</span></p>
+
+                    <h4 data-i18n="about.interestsTitle">兴趣！</h4>
+                    <ul>
+                        <li data-i18n="about.interestGameDev">游戏开发</li>
+                        <li data-i18n="about.interestMusic">音乐！</li>
+                        <li data-i18n="about.interestIndie">试玩各种独立游戏</li>
+                        <li data-i18n="about.interestSplatoon">Splatoon系列</li>
+                        <li data-i18n="about.interestPokemon">Pokemon系列</li>
+                        <li data-i18n="about.interestArts">以及大部分艺类活动</li>
+                    </ul>
+
+                    <h4 data-i18n="about.languageTitle">语言</h4>
+                    <p data-i18n="about.languageBody">我的母语是Chinese/中文，我的其他外语能力很烂，所以如果你以其他语言与我交流我很可能会使用机器翻译...</p>
+                </section>
+            </div>
+        </section>
+
+        <section class="content-area work-page-window" id="work-window" data-page-window data-secondary-window aria-labelledby="work-window-title" aria-hidden="true">
+            <header class="content-window-titlebar" data-page-window-drag tabindex="0" aria-label="拖动作品窗口" data-i18n-aria-label="window.dragWork">
+                <div class="window-title"><span id="work-window-title" data-i18n="work.windowTitle">作品</span></div>
+                <div class="content-window-tools">
+                    <button class="window-reset" type="button" data-page-window-reset aria-label="还原作品窗口位置" data-i18n-aria-label="window.resetWork">↺</button>
+                    <button class="window-close" type="button" data-page-window-close aria-label="关闭作品窗口" data-i18n-aria-label="window.closeWork">×</button>
                 </div>
-            </section>
-        </div>
+            </header>
+
+            <div class="content-window-body work-window-body">
+                <aside class="work-callout">
+                    <p><span data-i18n="work.inviteLead">如果你有想实现的Unity mod亦或者是Minecraft mod欢迎</span><a href="mailto:1178391318@qq.com" data-i18n="work.inviteMail">前往我的邮箱邀约</a></p>
+                </aside>
+
+                <section class="work-section" aria-labelledby="work-tools-title">
+                    <h2 id="work-tools-title" data-i18n="work.toolsTitle">工具</h2>
+                    <div class="tool-grid">
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="523.25">Krita</button>
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="587.33">Aseprite</button>
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="659.25">Blockbench</button>
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="698.46">Blender</button>
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="783.99">Unity</button>
+                        <button class="tool-button" type="button" aria-disabled="true" data-tool-chime data-chime-note="880.00">Godot</button>
+                    </div>
+                </section>
+
+                <section class="work-section" aria-labelledby="work-games-title">
+                    <h2 id="work-games-title" data-i18n="work.gamesTitle">游戏</h2>
+                    <div class="game-grid">
+                        <a class="game-card" href="https://shan-ka.itch.io/three-tu-one" target="_blank" rel="noopener noreferrer">
+                            <img src="https://img.itch.zone/aW1nLzI4NzkwMzU2LnBuZw==/508x254%23mb/4sPFnc.png" alt="Three 🐰 one 的游戏封面" data-i18n-alt="work.threeCoverAlt" loading="lazy">
+                            <span>Three 🐰 one</span>
+                        </a>
+                        <a class="game-card" href="https://abysslasea.itch.io/tightrope-deathmatch" target="_blank" rel="noopener noreferrer">
+                            <img src="https://img.itch.zone/aW1nLzI3MTcwMDA2LnBuZw==/508x254%23mb/vKMS6p.png" alt="Tightrope Deathmatch 的游戏封面" data-i18n-alt="work.tightropeCoverAlt" loading="lazy">
+                            <span>Tightrope Deathmatch</span>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer"><p data-i18n="footer.copyright">© 2026 AbyssLasea</p></footer>
