@@ -1,47 +1,47 @@
-(function() {
-    const SMOOTHING = 0.2;
+(function () {
+    'use strict';
+
+    const LOGIC_STEP = 1000 / 60;
+    const FOLLOW_SMOOTHING = 0.2;
+    const MAX_FRAME_DELTA = 100;
+
     let cursor = null;
     let cursorDot = null;
-    let pos = { curr: null, prev: null };
     let animationFrameId = null;
-    let pointerTargets = new Set();
+    let previousFrameTime = null;
+    let accumulator = 0;
+    let pointerTarget = null;
+    let hoverState = false;
+
+    const input = { x: 0, y: 0, ready: false };
+    const dotState = {
+        previous: { x: 0, y: 0 },
+        current: { x: 0, y: 0 }
+    };
+    const ringState = {
+        previous: { x: 0, y: 0 },
+        current: { x: 0, y: 0 }
+    };
 
     function isTouchDevice() {
-        return window.matchMedia("(pointer: coarse)").matches || 
-               /AppWebKit.*Mobile.*/.test(window.navigator.userAgent);
+        return window.matchMedia('(pointer: coarse)').matches ||
+            /AppWebKit.*Mobile.*/.test(window.navigator.userAgent);
     }
 
-    function moveCursor(x, y) {
-        if (cursor) {
-            cursor.style.left = x + 'px';
-            cursor.style.top = y + 'px';
-        }
+    function setPosition(element, x, y) {
+        if (!element) return;
+        element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -50%)`;
     }
 
-    function moveDot(x, y) {
-        if (cursorDot) {
-            cursorDot.style.left = x + 'px';
-            cursorDot.style.top = y + 'px';
-        }
+    function interpolate(previous, current, alpha) {
+        return {
+            x: previous.x + (current.x - previous.x) * alpha,
+            y: previous.y + (current.y - previous.y) * alpha
+        };
     }
 
     function targetUsesPointerCursor(target) {
-        let el = target instanceof Element ? target : null;
-        while (el) {
-            if (pointerTargets.has(el)) return true;
-            el = el.parentElement;
-        }
-        return false;
-    }
-
-    function collectPointerTargets() {
-        pointerTargets.clear();
-        const allElements = document.body.getElementsByTagName('*');
-        for (const el of allElements) {
-            if (window.getComputedStyle(el).cursor === 'pointer') {
-                pointerTargets.add(el);
-            }
-        }
+        return target instanceof Element && Boolean(target.closest('a, button, [role="button"], input, select, textarea'));
     }
 
     function ensureElements() {
@@ -54,6 +54,7 @@
                 document.body.appendChild(cursor);
             }
         }
+
         if (!cursorDot) {
             cursorDot = document.getElementById('cursor-dot');
             if (!cursorDot) {
@@ -65,39 +66,72 @@
         }
     }
 
+    function resetState() {
+        input.x = 0;
+        input.y = 0;
+        input.ready = false;
+        dotState.previous.x = 0;
+        dotState.previous.y = 0;
+        dotState.current.x = 0;
+        dotState.current.y = 0;
+        ringState.previous.x = 0;
+        ringState.previous.y = 0;
+        ringState.current.x = 0;
+        ringState.current.y = 0;
+        pointerTarget = null;
+        hoverState = false;
+        previousFrameTime = null;
+        accumulator = 0;
+    }
+
     function destroy() {
         if (animationFrameId !== null) {
-            cancelAnimationFrame(animationFrameId);
+            window.cancelAnimationFrame(animationFrameId);
             animationFrameId = null;
         }
-        document.removeEventListener('mousemove', handleMouseMove);
+
+        document.removeEventListener('pointermove', handlePointerMove);
         document.removeEventListener('mouseenter', handleMouseEnter);
         document.removeEventListener('mouseleave', handleMouseLeave);
-        document.removeEventListener('mousedown', handleMouseDown);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('pointerdown', handlePointerDown);
+        document.removeEventListener('pointerup', handlePointerUp);
+        document.removeEventListener('pointercancel', handlePointerUp);
+
         if (cursor) cursor.remove();
         if (cursorDot) cursorDot.remove();
         cursor = null;
         cursorDot = null;
-        pointerTargets.clear();
-        pos = { curr: null, prev: null };
+        resetState();
     }
 
-    function handleMouseMove(e) {
-        if (!cursor || !cursorDot) return;
-        moveDot(e.clientX, e.clientY);
-        if (pos.curr === null) {
-            moveCursor(e.clientX, e.clientY);
+    function showCursor() {
+        if (cursor) cursor.classList.remove('hidden');
+        if (cursorDot) cursorDot.classList.remove('hidden');
+    }
+
+    function handlePointerMove(event) {
+        input.x = event.clientX;
+        input.y = event.clientY;
+        pointerTarget = event.target;
+
+        if (!input.ready) {
+            input.ready = true;
+            dotState.previous.x = input.x;
+            dotState.previous.y = input.y;
+            dotState.current.x = input.x;
+            dotState.current.y = input.y;
+            ringState.previous.x = input.x;
+            ringState.previous.y = input.y;
+            ringState.current.x = input.x;
+            ringState.current.y = input.y;
+            setPosition(cursorDot, input.x, input.y);
+            setPosition(cursor, input.x, input.y);
+            showCursor();
         }
-        pos.curr = { x: e.clientX, y: e.clientY };
-        cursor.classList.remove('hidden');
-        cursorDot.classList.remove('hidden');
-        cursor.classList.toggle('hover', targetUsesPointerCursor(e.target));
     }
 
     function handleMouseEnter() {
-        if (cursor) cursor.classList.remove('hidden');
-        if (cursorDot) cursorDot.classList.remove('hidden');
+        if (input.ready) showCursor();
     }
 
     function handleMouseLeave() {
@@ -105,23 +139,58 @@
         if (cursorDot) cursorDot.classList.add('hidden');
     }
 
-    function handleMouseDown() {
+    function handlePointerDown() {
         if (cursor) cursor.classList.add('active');
     }
 
-    function handleMouseUp() {
+    function handlePointerUp() {
         if (cursor) cursor.classList.remove('active');
     }
 
-    function render() {
-        if (pos.curr && pos.prev) {
-            pos.prev.x = (1 - SMOOTHING) * pos.prev.x + SMOOTHING * pos.curr.x;
-            pos.prev.y = (1 - SMOOTHING) * pos.prev.y + SMOOTHING * pos.curr.y;
-            moveCursor(pos.prev.x, pos.prev.y);
-        } else if (pos.curr) {
-            pos.prev = { ...pos.curr };
+    function updateLogic() {
+        if (!input.ready) return;
+
+        dotState.previous.x = dotState.current.x;
+        dotState.previous.y = dotState.current.y;
+        dotState.current.x = input.x;
+        dotState.current.y = input.y;
+
+        ringState.previous.x = ringState.current.x;
+        ringState.previous.y = ringState.current.y;
+        ringState.current.x += (input.x - ringState.current.x) * FOLLOW_SMOOTHING;
+        ringState.current.y += (input.y - ringState.current.y) * FOLLOW_SMOOTHING;
+
+        const nextHoverState = targetUsesPointerCursor(pointerTarget);
+        if (nextHoverState !== hoverState && cursor) {
+            hoverState = nextHoverState;
+            cursor.classList.toggle('hover', hoverState);
         }
-        animationFrameId = requestAnimationFrame(render);
+    }
+
+    function render(timestamp) {
+        animationFrameId = window.requestAnimationFrame(render);
+
+        if (previousFrameTime === null) {
+            previousFrameTime = timestamp;
+            return;
+        }
+
+        const frameDelta = Math.min(timestamp - previousFrameTime, MAX_FRAME_DELTA);
+        previousFrameTime = timestamp;
+        accumulator += frameDelta;
+
+        while (accumulator >= LOGIC_STEP) {
+            updateLogic();
+            accumulator -= LOGIC_STEP;
+        }
+
+        if (!input.ready) return;
+
+        const alpha = accumulator / LOGIC_STEP;
+        const dotPosition = interpolate(dotState.previous, dotState.current, alpha);
+        const ringPosition = interpolate(ringState.previous, ringState.current, alpha);
+        setPosition(cursorDot, dotPosition.x, dotPosition.y);
+        setPosition(cursor, ringPosition.x, ringPosition.y);
     }
 
     function mount() {
@@ -129,16 +198,16 @@
             destroy();
             return;
         }
+
         ensureElements();
-        collectPointerTargets();
-        const observer = new MutationObserver(() => collectPointerTargets());
-        observer.observe(document.body, { childList: true, subtree: true });
-        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('pointermove', handlePointerMove, { passive: true });
         document.addEventListener('mouseenter', handleMouseEnter);
         document.addEventListener('mouseleave', handleMouseLeave);
-        document.addEventListener('mousedown', handleMouseDown);
-        document.addEventListener('mouseup', handleMouseUp);
-        render();
+        document.addEventListener('pointerdown', handlePointerDown, { passive: true });
+        document.addEventListener('pointerup', handlePointerUp, { passive: true });
+        document.addEventListener('pointercancel', handlePointerUp, { passive: true });
+        animationFrameId = window.requestAnimationFrame(render);
     }
+
     mount();
 })();
