@@ -126,12 +126,12 @@ a:focus-visible {
 
 .title-tilt {
     position: absolute;
-    top: clamp(6.75rem, 17svh, 10rem);
+    top: calc(50% - 60px);
     left: 50%;
     z-index: 6;
     display: block;
     width: min(54rem, calc(100vw - var(--page-gutter) * 2));
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
 }
 
 .title-tilt::part(container) {
@@ -616,10 +616,10 @@ html.has-reveal .reveal.is-visible {
     }
 
     .title-tilt {
-        top: max(calc(env(safe-area-inset-top) + 6rem), 12svh);
+        top: calc(50% - 60px);
         left: 50%;
         width: calc(100% - var(--page-gutter) * 2);
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
     }
 
     .hero h1 {
@@ -694,10 +694,6 @@ html.has-reveal .reveal.is-visible {
 }
 
 @media (max-width: 420px) {
-    .title-tilt {
-        top: max(calc(env(safe-area-inset-top) + 5.75rem), 11svh);
-    }
-
     .eyebrow {
         font-size: 0.62rem;
         letter-spacing: 0.18em;

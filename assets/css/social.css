@@ -1,6 +1,7 @@
 .site-header {
     position: absolute;
-    top: clamp(25rem, 52svh, 30rem);
+    top: auto;
+    bottom: 4.15rem;
     left: 0;
     z-index: 4;
     display: flex;
@@ -85,7 +86,8 @@ button.dock-link {
 
 @media (max-width: 700px) {
     .site-header {
-        top: clamp(19.5rem, 46svh, 24rem);
+        top: auto;
+        bottom: 3.55rem;
         padding-inline: 0.7rem;
     }
 
