@@ -19,6 +19,9 @@
     const MAX_FIXED_STEPS = 4;
     const REPOSE_ANGLE = 35;
     const COHESION = 0.58;
+    const POINTER_RADIUS_PX = 28;
+    const TOUCH_RADIUS_PX = 34;
+    const MAX_POINTER_SAMPLES = 12;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let simWidth = 1;
@@ -43,7 +46,13 @@
     let frame = 0;
     let active = true;
     let animationFrame = 0;
+    let interactionRenderFrame = 0;
     let previousTime = performance.now();
+    let pointerActive = false;
+    let pointerDown = false;
+    let pointerId = null;
+    let pointerX = 0;
+    let pointerY = 0;
 
     function index(x, y) {
         return y * simWidth + x;
@@ -128,6 +137,7 @@
         }
 
         emitRemainder = 0;
+        pointerActive = false;
         spawnLaneCount = clamp(Math.round(viewWidth / 46), 14, 40);
         spawnLanes = Array.from({ length: spawnLaneCount }, (_, lane) => lane);
         shuffleSpawnLanes();
@@ -336,6 +346,193 @@
         context.drawImage(sandLayer, 0, 0, viewWidth, viewHeight);
     }
 
+    function scheduleInteractionRender() {
+        if (!reducedMotion || interactionRenderFrame) return;
+
+        interactionRenderFrame = window.requestAnimationFrame(() => {
+            interactionRenderFrame = 0;
+            renderMaterial();
+            draw();
+        });
+    }
+
+    function findDisplacementTarget(x, y, centerX, centerY, motionX, motionY, radius) {
+        const offsetX = x - centerX;
+        const offsetY = y - centerY;
+        const offsetLength = Math.hypot(offsetX, offsetY);
+        const motionLength = Math.hypot(motionX, motionY);
+        let radialX = offsetLength > 0.01 ? offsetX / offsetLength : 0;
+        let radialY = offsetLength > 0.01 ? offsetY / offsetLength : -1;
+
+        if (offsetLength <= 0.01 && motionLength > 0.01) {
+            radialX = -motionY / motionLength;
+            radialY = motionX / motionLength;
+        }
+
+        const motionDirectionX = motionLength > 0.01 ? motionX / motionLength : 0;
+        const motionDirectionY = motionLength > 0.01 ? motionY / motionLength : 0;
+        let pushX = radialX * 0.78 + motionDirectionX * 1.15;
+        let pushY = radialY * 0.72 + motionDirectionY * 0.38 - 0.22;
+        const pushLength = Math.max(0.01, Math.hypot(pushX, pushY));
+        pushX /= pushLength;
+        pushY /= pushLength;
+
+        const startDistance = Math.max(2, Math.ceil(radius - offsetLength + 1));
+        const searchDistance = Math.ceil(startDistance + radius * 1.15 + motionLength * 0.3);
+
+        for (let distance = startDistance; distance <= searchDistance; distance += 1) {
+            const targetX = Math.round(x + pushX * distance);
+            const targetY = Math.round(y + pushY * distance);
+
+            if (
+                targetX <= 0 || targetX >= simWidth - 1 ||
+                targetY <= 0 || targetY >= simHeight - 1
+            ) {
+                continue;
+            }
+
+            const target = index(targetX, targetY);
+            if (material[target] === EMPTY) return target;
+        }
+
+        const baseAngle = Math.atan2(pushY, pushX);
+        for (let attempt = 0; attempt < 14; attempt += 1) {
+            const side = attempt % 2 === 0 ? 1 : -1;
+            const angle = baseAngle + side * Math.ceil(attempt / 2) * 0.16;
+            const distance = radius + 2 + Math.floor(attempt / 4);
+            const targetX = Math.round(centerX + Math.cos(angle) * distance);
+            const targetY = Math.round(centerY + Math.sin(angle) * distance);
+
+            if (
+                targetX <= 0 || targetX >= simWidth - 1 ||
+                targetY <= 0 || targetY >= simHeight - 1
+            ) {
+                continue;
+            }
+
+            const target = index(targetX, targetY);
+            if (material[target] === EMPTY) return target;
+        }
+
+        return -1;
+    }
+
+    function displaceSnow(centerX, centerY, motionX, motionY, radius) {
+        const radiusSquared = radius * radius;
+        const minimumX = Math.max(1, Math.floor(centerX - radius));
+        const maximumX = Math.min(simWidth - 2, Math.ceil(centerX + radius));
+        const minimumY = Math.max(1, Math.floor(centerY - radius));
+        const maximumY = Math.min(simHeight - 2, Math.ceil(centerY + radius));
+
+        for (let y = minimumY; y <= maximumY; y += 1) {
+            for (let x = minimumX; x <= maximumX; x += 1) {
+                const deltaX = x - centerX;
+                const deltaY = y - centerY;
+                if (deltaX * deltaX + deltaY * deltaY > radiusSquared) continue;
+
+                const source = index(x, y);
+                if (material[source] === EMPTY || moved[source] === 1) continue;
+
+                const target = findDisplacementTarget(
+                    x,
+                    y,
+                    centerX,
+                    centerY,
+                    motionX,
+                    motionY,
+                    radius
+                );
+                if (target < 0) continue;
+
+                material[target] = LOOSE;
+                material[source] = EMPTY;
+                moved[target] = 1;
+            }
+        }
+    }
+
+    function interactWithSnow(nextX, nextY, radius) {
+        const motionX = nextX - pointerX;
+        const motionY = nextY - pointerY;
+        const distance = Math.hypot(motionX, motionY);
+        const samples = clamp(
+            Math.ceil(distance / Math.max(1, radius * 0.42)),
+            1,
+            MAX_POINTER_SAMPLES
+        );
+
+        moved.fill(0);
+        for (let sample = 1; sample <= samples; sample += 1) {
+            const progress = sample / samples;
+            displaceSnow(
+                pointerX + motionX * progress,
+                pointerY + motionY * progress,
+                motionX / samples,
+                motionY / samples,
+                radius
+            );
+        }
+
+        pointerX = nextX;
+        pointerY = nextY;
+        scheduleInteractionRender();
+    }
+
+    function pointerPosition(event) {
+        const bounds = stage.getBoundingClientRect();
+        const pageBounds = mountainPage.getBoundingClientRect();
+        const visibleTop = Math.max(bounds.top, pageBounds.top, 0);
+        const visibleBottom = Math.min(bounds.bottom, pageBounds.bottom, window.innerHeight);
+
+        if (
+            event.clientX < bounds.left || event.clientX > bounds.right ||
+            event.clientY < visibleTop || event.clientY > visibleBottom
+        ) {
+            return null;
+        }
+
+        return {
+            x: (event.clientX - bounds.left) / bounds.width * simWidth,
+            y: (event.clientY - bounds.top) / bounds.height * simHeight
+        };
+    }
+
+    function handlePointerMove(event) {
+        if (event.pointerType === 'touch' && (!pointerDown || event.pointerId !== pointerId)) return;
+
+        const position = pointerPosition(event);
+        if (!position) {
+            pointerActive = false;
+            return;
+        }
+
+        const radiusPixels = event.pointerType === 'touch' ? TOUCH_RADIUS_PX : POINTER_RADIUS_PX;
+        const radius = Math.max(5, radiusPixels * simWidth / viewWidth);
+
+        if (!pointerActive) {
+            pointerActive = true;
+            pointerX = position.x;
+            pointerY = position.y;
+        }
+
+        interactWithSnow(position.x, position.y, radius);
+    }
+
+    function handlePointerDown(event) {
+        if (event.pointerType !== 'touch') return;
+        pointerDown = true;
+        pointerId = event.pointerId;
+        pointerActive = false;
+        handlePointerMove(event);
+    }
+
+    function handlePointerEnd(event) {
+        if (event.pointerType !== 'touch' || event.pointerId !== pointerId) return;
+        pointerDown = false;
+        pointerId = null;
+        pointerActive = false;
+    }
+
     function tick(now) {
         animationFrame = 0;
         const deltaSeconds = Math.min((now - previousTime) / 1000, 0.1);
@@ -394,6 +591,16 @@
     } else {
         window.addEventListener('resize', rebuildSimulation, { passive: true });
     }
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerdown', handlePointerDown, { passive: true });
+    window.addEventListener('pointerup', handlePointerEnd, { passive: true });
+    window.addEventListener('pointercancel', handlePointerEnd, { passive: true });
+    window.addEventListener('blur', () => {
+        pointerActive = false;
+        pointerDown = false;
+        pointerId = null;
+    });
 
     rebuildSimulation();
     start();
