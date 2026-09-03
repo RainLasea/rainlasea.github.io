@@ -10,6 +10,13 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: "RoundedMgenCJK";
+    src: url("../fonts/LXGWMarkerGothic-Regular.ttf") format("truetype");
+    font-display: swap;
+    unicode-range: U+2E80-2EFF, U+2F00-2FDF, U+3000-303F, U+31C0-31EF, U+3400-4DBF, U+4E00-9FFF, U+F900-FAFF, U+FE10-FE1F, U+FE30-FE4F, U+FF00-FFEF, U+20000-2FA1F;
+}
+
 :root {
     color-scheme: dark;
     --ink: #eef2f7;
@@ -20,6 +27,7 @@
     --blue: #7bc7d3;
     --gold: #f2c780;
     --page-gutter: clamp(1rem, 4vw, 3rem);
+    --page-window-max: 54rem;
     --far-x: 0px;
     --far-y: 3px;
     --mid-x: 0px;
@@ -48,7 +56,7 @@ body {
     overflow-x: clip;
     background: var(--night);
     color: var(--ink);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
     text-rendering: optimizeLegibility;
 }
 
@@ -124,6 +132,174 @@ a:focus-visible {
     transform: translate(var(--front-x), var(--front-y)) scale(1.045);
 }
 
+.impostor-easter-egg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 4;
+    width: 8rem;
+    height: 10rem;
+    pointer-events: none;
+    opacity: 0.78;
+    filter: drop-shadow(0 1rem 1.1rem rgba(2, 5, 12, 0.36));
+    animation: impostor-float 4.8s ease-in-out infinite;
+}
+
+.impostor,
+.impostor *,
+.impostor *::before,
+.impostor *::after {
+    box-sizing: content-box;
+}
+
+.impostor {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 360px;
+    height: 650px;
+    isolation: isolate;
+    transform: translate(-50%, -50%) rotate(7deg) scale(0.29);
+    transform-origin: center;
+}
+
+.impostor .body {
+    position: relative;
+    z-index: 2;
+    width: 300px;
+    height: 420px;
+    overflow: hidden;
+    border: 30px solid #08090d;
+    border-radius: 35% 45% 0 0;
+}
+
+.impostor .body .fill {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #7b0236;
+}
+
+.impostor .body .shadow {
+    position: absolute;
+    width: 100%;
+    height: 90%;
+    background: #c70a01;
+    border-radius: 0 10% 25% 48% / 20% 0 100% 100%;
+}
+
+.impostor .glass-bowl {
+    position: absolute;
+    top: 90px;
+    right: -20px;
+    z-index: 3;
+    width: 220px;
+    height: 130px;
+    overflow: hidden;
+    border: 30px solid #08090d;
+    border-radius: 25% 45% 40% 40% / 50%;
+    background: #4a646d;
+    transform: rotate(-4deg);
+}
+
+.impostor .glass-bowl .shadow-blue {
+    position: absolute;
+    right: 0;
+    width: 90%;
+    height: 70px;
+    border-radius: 10% 10% 100% 100% / 100% 100% 50% 100%;
+    background: #94c9db;
+}
+
+.impostor .glass-bowl .shadow-white {
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    width: 100px;
+    height: 40px;
+    border-radius: 30% 70% 30% 30% / 30% 70% 30% 60%;
+    background: #ffffff;
+}
+
+.impostor .legs {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-30px);
+}
+
+.impostor .legs .leg-left {
+    width: 110px;
+    height: 130px;
+    border-right: 30px solid #08090d;
+    border-bottom: 30px solid #08090d;
+    border-left: 30px solid #08090d;
+    border-radius: 0 0 40% 40%;
+    background: #7b0236;
+}
+
+.impostor .legs .leg-right {
+    position: relative;
+    width: 90px;
+    height: 105px;
+    border-right: 30px solid #08090d;
+    border-bottom: 30px solid #08090d;
+    border-left: 30px solid #08090d;
+    border-radius: 0 0 40% 40%;
+    background: #7b0236;
+}
+
+.impostor .legs .leg-right::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 100px;
+    height: 30px;
+    border-radius: 0 0 100% 0;
+    background: #08090d;
+}
+
+.impostor .backpack {
+    position: absolute;
+    top: 130px;
+    left: -75px;
+    z-index: 1;
+    width: 90px;
+    height: 280px;
+    overflow: hidden;
+    border: 30px solid #08090d;
+    border-radius: 40% 0 0 40% / 15%;
+    background: #c70a01;
+}
+
+.impostor .backpack .shadow {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 85%;
+    border-radius: 40% 0 0 / 10% 0 0;
+    background: #7b0236;
+}
+
+.impostor .floor-shadow {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    z-index: 0;
+    width: 450px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(15, 22, 31, 0.48);
+    transform: translateX(-50%);
+}
+
+@keyframes impostor-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-0.45rem); }
+}
+
 .title-tilt {
     position: absolute;
     top: calc(50% - 60px);
@@ -163,7 +339,7 @@ a:focus-visible {
 }
 
 .hi {
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
     font-size: clamp(0.78rem, 1.5vw, 1rem);
     text-transform: uppercase;
     transform: translateZ(calc(var(--hover-tilt-opacity, 0) * 10px));
@@ -172,7 +348,7 @@ a:focus-visible {
 .hero h1 {
     margin: 0.75rem auto 0;
     max-width: none;
-    font-family: "BlitzMain", Impact, sans-serif;
+    font-family: "RoundedMgenCJK", "BlitzMain", Impact, sans-serif;
     font-size: clamp(5.5rem, 10.2vw, 9.8rem);
     font-weight: 400;
     line-height: 0.73;
@@ -193,7 +369,7 @@ a:focus-visible {
     margin: 0;
     max-width: 38rem;
     color: rgba(245, 247, 250, 0.8);
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
     font-size: clamp(0.85rem, 1.7vw, 1.04rem);
     line-height: 1.8;
     letter-spacing: 0.06em;
@@ -261,10 +437,37 @@ a:focus-visible {
     mask-image: linear-gradient(180deg, black, transparent 72%);
 }
 
+.desktop-area {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 100svh;
+    align-items: center;
+    justify-content: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    background:
+        radial-gradient(circle at 86% 8%, rgba(92, 128, 148, 0.2), transparent 30rem),
+        linear-gradient(180deg, #0d1523 0%, #0a101a 100%);
+    scroll-margin-top: 0;
+}
+
+.desktop-area::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.22;
+    background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: linear-gradient(180deg, black, transparent 72%);
+}
+
 .section-kicker {
     margin: 0;
     color: var(--gold);
-    font: 700 0.66rem/1.3 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 700 0.66rem/1.3 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
     letter-spacing: 0.16em;
     text-transform: uppercase;
 }
@@ -310,7 +513,7 @@ a:focus-visible {
 
 .about-copy h2 {
     margin: 0.65rem 0 0.85rem;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
     font-size: clamp(1.85rem, 4vw, 3.15rem);
     font-weight: 400;
     line-height: 1.12;
@@ -340,7 +543,7 @@ a:focus-visible {
     padding-left: 1.5rem;
     border-left: 1px solid var(--line);
     color: rgba(255, 255, 255, 0.16);
-    font-family: "BlitzMain", Impact, sans-serif;
+    font-family: "RoundedMgenCJK", "BlitzMain", Impact, sans-serif;
     font-size: 3rem;
     line-height: 0.72;
     text-align: right;
@@ -395,7 +598,7 @@ a:focus-visible {
     margin: 0 0 0.32rem;
     overflow-wrap: anywhere;
     color: #f1f3f6;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
     font-size: 1.17rem;
     font-weight: 400;
 }
@@ -474,6 +677,18 @@ html.has-reveal .reveal.is-visible {
         left: 50%;
         width: calc(100% - var(--page-gutter) * 2);
         transform: translate(-50%, -50%);
+    }
+
+    .impostor-easter-egg {
+        top: 50%;
+        left: 50%;
+        width: 6rem;
+        height: 8rem;
+        opacity: 0.68;
+    }
+
+    .impostor {
+        transform: translate(-50%, -50%) rotate(7deg) scale(0.21);
     }
 
     .hero h1 {
@@ -584,9 +799,9 @@ html.has-reveal .reveal.is-visible {
     --window-origin-x: 50%;
     --window-origin-y: 50%;
     z-index: 30;
-    width: min(calc(100% - var(--page-gutter) * 2), 1120px);
+    width: min(calc(100% - var(--page-gutter) * 2), var(--page-window-max));
     min-height: 0;
-    margin: clamp(2rem, 5vw, 4.5rem) auto;
+    margin: clamp(1.5rem, 4vw, 3.5rem) auto;
     padding: 0;
     overflow: hidden;
     border: 2px solid #ffffff;
@@ -650,12 +865,12 @@ html.has-reveal .reveal.is-visible {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 3.2rem;
-    padding-left: 1rem;
+    min-height: 2.85rem;
+    padding-left: 0.85rem;
     border-bottom: 2px solid #ffffff;
     background: #171717;
     color: #ffffff;
-    font: 700 0.74rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 700 0.74rem/1 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
     letter-spacing: 0.1em;
     cursor: grab;
     touch-action: none;
@@ -684,12 +899,12 @@ html.has-reveal .reveal.is-visible {
 .window-reset,
 .window-close {
     align-self: stretch;
-    width: 3.4rem;
+    width: 3.1rem;
     border: 0;
     border-left: 2px solid #ffffff;
     background: #171717;
     color: #ffffff;
-    font: 1.15rem/1 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 1.15rem/1 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
     cursor: pointer;
 }
 
@@ -703,7 +918,7 @@ html.has-reveal .reveal.is-visible {
 }
 
 .content-window-body {
-    max-height: min(76vh, 50rem);
+    max-height: min(70vh, 44rem);
     overflow: auto;
     background: #132135;
     color: #ffffff;
@@ -712,25 +927,25 @@ html.has-reveal .reveal.is-visible {
 
 .window-main {
     display: flex;
-    min-height: clamp(34rem, 64vh, 42rem);
+    min-height: clamp(28rem, 56vh, 36rem);
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: clamp(3rem, 7vw, 5.5rem) clamp(1.25rem, 5vw, 4rem);
+    padding: clamp(2.25rem, 5vw, 3.75rem) clamp(1.25rem, 4vw, 3rem);
     background: #132135;
     color: #ffffff;
     text-align: center;
 }
 
 .home-intro {
-    width: min(100%, 52rem);
+    width: min(100%, 46rem);
 }
 
 .home-intro h2 {
     margin: 0;
     color: #c0faff;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
-    font-size: clamp(3rem, 6vw, 5.4rem);
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
+    font-size: clamp(2.7rem, 5.4vw, 4.8rem);
     font-weight: 400;
     line-height: 1;
 }
@@ -741,10 +956,10 @@ html.has-reveal .reveal.is-visible {
 }
 
 .home-role {
-    margin: 1.25rem 0 0;
+    margin: 0.9rem 0 0;
     color: #ffffff;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
-    font-size: clamp(1.55rem, 3.2vw, 2.7rem);
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
+    font-size: clamp(1.45rem, 2.8vw, 2.3rem);
     font-weight: 400;
     line-height: 1.15;
 }
@@ -752,9 +967,9 @@ html.has-reveal .reveal.is-visible {
 .home-apps {
     display: grid;
     grid-template-columns: repeat(4, minmax(5.5rem, 1fr));
-    gap: clamp(0.75rem, 2vw, 1.5rem);
-    width: min(100%, 48rem);
-    margin-top: clamp(3rem, 7vw, 5rem);
+    gap: clamp(0.65rem, 1.5vw, 1.2rem);
+    width: min(100%, 42rem);
+    margin-top: clamp(2.2rem, 5vw, 3.3rem);
 }
 
 .home-app {
@@ -762,12 +977,12 @@ html.has-reveal .reveal.is-visible {
     min-width: 0;
     flex-direction: column;
     align-items: center;
-    gap: 0.65rem;
-    padding: 0.5rem;
+    gap: 0.5rem;
+    padding: 0.35rem;
     border: 0;
     background: transparent;
     color: #ffffff;
-    font: 700 0.75rem/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 700 0.75rem/1.2 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
     letter-spacing: 0.04em;
     cursor: pointer;
 }
@@ -779,7 +994,7 @@ html.has-reveal .reveal.is-visible {
 }
 
 .home-app-icon {
-    width: clamp(2.8rem, 5vw, 3.5rem);
+    width: clamp(2.65rem, 4.5vw, 3.2rem);
     height: auto;
     object-fit: contain;
 }
@@ -790,8 +1005,8 @@ html.has-reveal .reveal.is-visible {
 
 .about-page-window {
     position: absolute;
-    top: calc(220svh + clamp(3rem, 6vw, 5.5rem));
-    left: max(var(--page-gutter), calc((100% - 1120px) / 2));
+    top: clamp(3rem, 6vw, 5.5rem);
+    left: max(var(--page-gutter), calc((100% - var(--page-window-max)) / 2));
     display: none;
     margin: 0;
 }
@@ -804,7 +1019,7 @@ html.has-reveal .reveal.is-visible {
 .about-window-body {
     display: grid;
     grid-template-rows: minmax(0, 4fr) minmax(0, 6fr);
-    height: min(76vh, 46rem);
+    height: min(70vh, 40rem);
     max-height: none;
     overflow: hidden;
 }
@@ -814,8 +1029,8 @@ html.has-reveal .reveal.is-visible {
     min-height: 0;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: clamp(1.5rem, 4vw, 3.5rem);
-    padding: clamp(1.5rem, 4vw, 3rem);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    padding: clamp(1.25rem, 3vw, 2rem);
     border-bottom: 1px solid #ffffff;
     background: #132135;
 }
@@ -826,7 +1041,7 @@ html.has-reveal .reveal.is-visible {
 }
 
 .about-profile-avatar {
-    width: clamp(7rem, 15vw, 10.5rem);
+    width: clamp(6.5rem, 13vw, 8.5rem);
     aspect-ratio: 1;
     border: 2px solid #ffffff;
     border-radius: 50%;
@@ -846,22 +1061,22 @@ html.has-reveal .reveal.is-visible {
 .about-summary-copy h2 {
     margin: 0;
     color: #c0faff;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
-    font-size: clamp(2.2rem, 5vw, 4rem);
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 400;
     line-height: 1;
 }
 
 .about-summary-copy p {
-    margin: 1rem 0 0;
+    margin: 0.75rem 0 0;
     color: #ffffff;
-    font-size: clamp(1rem, 2vw, 1.35rem);
-    line-height: 1.65;
+    font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+    line-height: 1.5;
 }
 
 .about-details {
     min-height: 0;
-    padding: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 3vw, 2rem);
     overflow: auto;
     border: 0;
     background: #132135;
@@ -872,26 +1087,26 @@ html.has-reveal .reveal.is-visible {
 .markdown-content h3,
 .markdown-content h4 {
     color: #ffffff;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
     font-weight: 400;
 }
 
 .markdown-content h3 {
-    margin: 0 0 1rem;
-    font-size: clamp(1.65rem, 3vw, 2.4rem);
+    margin: 0 0 0.8rem;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
 }
 
 .markdown-content h4 {
-    margin: 1.6rem 0 0.7rem;
-    font-size: 1.2rem;
+    margin: 1.25rem 0 0.55rem;
+    font-size: 1.1rem;
 }
 
 .markdown-content p,
 .markdown-content li,
 .markdown-content blockquote {
     color: #ffffff;
-    font-size: 0.94rem;
-    line-height: 1.8;
+    font-size: 1.12rem;
+    line-height: 1.52;
 }
 
 .markdown-content ul {
@@ -912,27 +1127,27 @@ html.has-reveal .reveal.is-visible {
 }
 
 .about-contact {
-    margin-top: 1.6rem;
+    margin-top: 1.25rem;
 }
 
 .work-page-window {
     position: absolute;
-    top: calc(220svh + clamp(3rem, 6vw, 5.5rem));
-    left: max(var(--page-gutter), calc((100% - 1120px) / 2));
+    top: clamp(3rem, 6vw, 5.5rem);
+    left: max(var(--page-gutter), calc((100% - var(--page-window-max)) / 2));
     display: none;
     margin: 0;
 }
 
 .work-window-body {
-    height: min(76vh, 46rem);
+    height: min(70vh, 40rem);
     max-height: none;
-    padding: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 3vw, 2rem);
     overflow: auto;
 }
 
 .work-callout {
-    width: min(100%, 48rem);
-    padding: clamp(1rem, 2.5vw, 1.4rem) clamp(1.1rem, 3vw, 1.75rem);
+    width: 100%;
+    padding: clamp(0.9rem, 2vw, 1.2rem) clamp(1rem, 2.5vw, 1.4rem);
     border-radius: 1.15rem;
     background: #3f80bd;
     color: #ffffff;
@@ -958,14 +1173,14 @@ html.has-reveal .reveal.is-visible {
 }
 
 .work-section {
-    margin-top: clamp(2rem, 5vw, 3.5rem);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .work-section h2 {
-    margin: 0 0 1.25rem;
+    margin: 0 0 1rem;
     color: #ffffff;
-    font-family: "FOT", "Microsoft YaHei", sans-serif;
-    font-size: clamp(1.65rem, 3vw, 2.4rem);
+    font-family: "RoundedMgenCJK", "FOT", "Microsoft YaHei", sans-serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
     font-weight: 400;
     line-height: 1;
 }
@@ -973,18 +1188,18 @@ html.has-reveal .reveal.is-visible {
 .tool-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.75rem;
-    width: min(100%, 44rem);
+    gap: 0.65rem;
+    width: 100%;
 }
 
 .tool-button {
-    min-height: 3.15rem;
-    padding: 0.7rem 1rem;
+    min-height: 2.9rem;
+    padding: 0.6rem 0.85rem;
     border: 1px solid #ffffff;
     border-radius: 0.45rem;
     background: #171717;
     color: #ffffff;
-    font: 700 clamp(0.8rem, 1.6vw, 0.95rem)/1.2 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 700 clamp(0.8rem, 1.6vw, 0.95rem)/1.2 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
     letter-spacing: 0.035em;
     cursor: default;
     transition: transform 120ms ease, background-color 120ms ease, color 120ms ease;
@@ -1002,7 +1217,7 @@ html.has-reveal .reveal.is-visible {
 .game-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(1rem, 3vw, 1.5rem);
+    gap: clamp(0.8rem, 2vw, 1.1rem);
 }
 
 .game-card {
@@ -1033,9 +1248,9 @@ html.has-reveal .reveal.is-visible {
 }
 
 .game-card span {
-    padding: 1rem;
+    padding: 0.8rem;
     overflow-wrap: anywhere;
-    font: 700 clamp(0.85rem, 1.8vw, 1rem)/1.35 ui-monospace, SFMono-Regular, Consolas, monospace;
+    font: 700 clamp(0.85rem, 1.8vw, 1rem)/1.35 "RoundedMgenCJK", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 @keyframes about-avatar-pulse {
@@ -1044,19 +1259,39 @@ html.has-reveal .reveal.is-visible {
     70% { transform: scale(0.97); }
 }
 
+@media (min-width: 761px) {
+    .about-window-body {
+        grid-template-rows: minmax(0, 1fr);
+        grid-template-columns: minmax(15rem, 0.82fr) minmax(0, 1.35fr);
+    }
+
+    .about-summary {
+        grid-template-columns: minmax(0, 1fr);
+        align-content: center;
+        justify-items: center;
+        border-right: 1px solid #ffffff;
+        border-bottom: 0;
+        text-align: center;
+    }
+
+    .about-avatar-link {
+        justify-self: center;
+    }
+}
+
 @media (max-width: 760px) {
     .content-area[data-page-window] {
         width: calc(100% - 1rem);
-        margin: 1rem auto 2rem;
+        margin: 0.75rem auto 1.5rem;
     }
 
     .content-window-body {
-        max-height: 72svh;
+        max-height: 68svh;
     }
 
     .window-main {
-        min-height: 36rem;
-        padding: 3rem 1rem;
+        min-height: 30rem;
+        padding: 2rem 0.85rem;
     }
 
     .home-intro h2 {
@@ -1070,23 +1305,23 @@ html.has-reveal .reveal.is-visible {
     .home-apps {
         grid-template-columns: repeat(2, minmax(4.8rem, 1fr));
         width: min(100%, 26rem);
-        margin-top: 3.5rem;
+        margin-top: 2.5rem;
     }
 
     .about-page-window,
     .work-page-window {
-        top: calc(200svh + 2rem);
+        top: 2rem;
         left: 0.5rem;
         margin: 0;
     }
 
     .about-window-body,
     .work-window-body {
-        height: 72svh;
+        height: 68svh;
     }
 
     .work-window-body {
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
     .tool-grid {
@@ -1099,7 +1334,7 @@ html.has-reveal .reveal.is-visible {
 
     .about-summary {
         gap: 1.1rem;
-        padding: 1.25rem;
+        padding: 1rem;
     }
 
     .about-profile-avatar {

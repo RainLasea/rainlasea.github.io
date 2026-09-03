@@ -9,26 +9,92 @@
     const states = new WeakMap();
     let topLayer = 30;
     let activeWindow = windowElements[0];
-    let chimeContext = null;
-    let lastChimeAt = 0;
+    let audioContext = null;
+    let audioOutput = null;
+    let lastSoundAt = 0;
 
-    const unlockChime = () => {
+    const unlockAudio = () => {
         const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextConstructor) return null;
-        if (!chimeContext) chimeContext = new AudioContextConstructor();
-        if (chimeContext.state === 'suspended') void chimeContext.resume().catch(() => {});
-        return chimeContext;
+        if (!audioContext) {
+            audioContext = new AudioContextConstructor();
+            audioOutput = audioContext.createGain();
+            audioOutput.gain.value = 0.28;
+            audioOutput.connect(audioContext.destination);
+        }
+        if (audioContext.state === 'suspended') void audioContext.resume().catch(() => {});
+        return audioContext;
+    };
+
+    const canPlaySound = (minimumGap = 45) => {
+        const nowMs = window.performance.now();
+        if (nowMs - lastSoundAt < minimumGap) return false;
+        lastSoundAt = nowMs;
+        return true;
+    };
+
+    const playTone = ({ frequency, frequencyEnd, delay = 0, duration = 0.12, volume = 0.12, type = 'sine' }) => {
+        if (!audioContext || !audioOutput) return;
+
+        const startedAt = audioContext.currentTime + delay;
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, startedAt);
+        if (frequencyEnd) oscillator.frequency.exponentialRampToValueAtTime(frequencyEnd, startedAt + duration);
+        gain.gain.setValueAtTime(0.0001, startedAt);
+        gain.gain.exponentialRampToValueAtTime(volume, startedAt + Math.min(0.008, duration / 3));
+        gain.gain.exponentialRampToValueAtTime(0.0001, startedAt + duration);
+        oscillator.connect(gain);
+        gain.connect(audioOutput);
+        oscillator.start(startedAt);
+        oscillator.stop(startedAt + duration + 0.02);
+    };
+
+    const playUiSound = (kind) => {
+        unlockAudio();
+        if (!canPlaySound()) return;
+
+        if (kind === 'open') {
+            playTone({ frequency: 523.25, frequencyEnd: 659.25, duration: 0.13, volume: 0.15, type: 'triangle' });
+            playTone({ frequency: 783.99, delay: 0.065, duration: 0.16, volume: 0.1 });
+            return;
+        }
+
+        if (kind === 'close') {
+            playTone({ frequency: 587.33, frequencyEnd: 349.23, duration: 0.16, volume: 0.13, type: 'triangle' });
+            return;
+        }
+
+        if (kind === 'reset') {
+            playTone({ frequency: 392, frequencyEnd: 659.25, duration: 0.1, volume: 0.12, type: 'triangle' });
+            playTone({ frequency: 783.99, delay: 0.075, duration: 0.11, volume: 0.09 });
+            return;
+        }
+
+        if (kind === 'pickup') {
+            playTone({ frequency: 440, frequencyEnd: 554.37, duration: 0.075, volume: 0.07, type: 'triangle' });
+            return;
+        }
+
+        if (kind === 'drop') {
+            playTone({ frequency: 174.61, frequencyEnd: 130.81, duration: 0.11, volume: 0.1, type: 'sine' });
+            playTone({ frequency: 523.25, delay: 0.025, duration: 0.08, volume: 0.045, type: 'triangle' });
+            return;
+        }
+
+        if (kind === 'card') {
+            playTone({ frequency: 659.25, frequencyEnd: 783.99, duration: 0.09, volume: 0.12, type: 'triangle' });
+            playTone({ frequency: 1046.5, delay: 0.055, duration: 0.14, volume: 0.09 });
+            return;
+        }
+
+        playTone({ frequency: 698.46, frequencyEnd: 880, duration: 0.085, volume: 0.1, type: 'triangle' });
     };
 
     const playToolChime = (button) => {
-        const nowMs = window.performance.now();
-        if (nowMs - lastChimeAt < 80) return;
+        if (!audioContext || audioContext.state !== 'running' || !canPlaySound(80)) return;
 
-        const audioContext = unlockChime();
-        if (!audioContext) return;
-        lastChimeAt = nowMs;
-
-        const startedAt = audioContext.currentTime;
         const baseFrequency = Number(button.dataset.chimeNote) || 659.25;
         const partials = [
             { ratio: 1, volume: 0.16, duration: 0.55 },
@@ -37,17 +103,7 @@
         ];
 
         partials.forEach(({ ratio, volume, duration }) => {
-            const oscillator = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(baseFrequency * ratio, startedAt);
-            gain.gain.setValueAtTime(0.0001, startedAt);
-            gain.gain.exponentialRampToValueAtTime(volume, startedAt + 0.006);
-            gain.gain.exponentialRampToValueAtTime(0.0001, startedAt + duration);
-            oscillator.connect(gain);
-            gain.connect(audioContext.destination);
-            oscillator.start(startedAt);
-            oscillator.stop(startedAt + duration + 0.02);
+            playTone({ frequency: baseFrequency * ratio, duration, volume });
         });
 
         button.classList.add('is-ringing');
@@ -113,6 +169,7 @@
 
     const openWindow = (windowElement, opener) => {
         if (!windowElement) return;
+        playUiSound('open');
         const state = states.get(windowElement);
         clearAnimationTimer(state);
         windowElement.classList.remove('is-opening', 'is-closing');
@@ -136,6 +193,7 @@
 
     const closeWindow = (windowElement) => {
         if (!windowElement?.hasAttribute('data-secondary-window')) return;
+        playUiSound('close');
         const state = states.get(windowElement);
         const opener = openers.find((item) => item.dataset.openPageWindow === windowElement.id);
         clearAnimationTimer(state);
@@ -189,10 +247,13 @@
             const startOffsetX = state.offsetX;
             const startOffsetY = state.offsetY;
             const baseBounds = getBaseBounds(windowElement, state);
+            let hasMoved = false;
             handle.setPointerCapture(event.pointerId);
             windowElement.classList.add('is-dragging');
+            playUiSound('pickup');
 
             const move = (moveEvent) => {
+                if (Math.abs(moveEvent.clientX - startX) + Math.abs(moveEvent.clientY - startY) > 4) hasMoved = true;
                 const position = constrainPosition(
                     startOffsetX + moveEvent.clientX - startX,
                     startOffsetY + moveEvent.clientY - startY,
@@ -205,6 +266,7 @@
 
             const stop = () => {
                 windowElement.classList.remove('is-dragging');
+                if (hasMoved) playUiSound('drop');
                 handle.removeEventListener('pointermove', move);
                 handle.removeEventListener('pointerup', stop);
                 handle.removeEventListener('pointercancel', stop);
@@ -227,6 +289,7 @@
         });
 
         resetButton?.addEventListener('click', () => {
+            playUiSound('reset');
             state.offsetX = 0;
             state.offsetY = 0;
             windowElement.classList.add('is-resetting');
@@ -240,8 +303,16 @@
 
     openers.forEach((opener) => {
         opener.addEventListener('click', () => {
-            if (opener.dataset.openPageWindow === 'work-window') unlockChime();
             openWindow(document.getElementById(opener.dataset.openPageWindow), opener);
+        });
+    });
+
+    windowElements.forEach((windowElement) => {
+        windowElement.addEventListener('click', (event) => {
+            if (!(event.target instanceof Element)) return;
+            const link = event.target.closest('a[href]');
+            if (!link) return;
+            playUiSound(link.classList.contains('game-card') ? 'card' : 'link');
         });
     });
 
