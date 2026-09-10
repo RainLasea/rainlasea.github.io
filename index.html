@@ -190,10 +190,10 @@
                             <span data-i18n="home.faq">FAQ</span>
                         </a>
                         -->
-                        <a class="home-app home-app-contact" href="mailto:1178391318@qq.com">
+                        <button class="home-app home-app-contact" type="button" data-open-page-window="contact-window" aria-controls="contact-window">
                             <img class="home-app-icon" src="https://api.iconify.design/lucide:message-circle.svg?color=%23ffffff" alt="" width="56" height="56" aria-hidden="true">
                             <span data-i18n="home.contact">联系方式</span>
-                        </a>
+                        </button>
                     </nav>
                 </section>
             </div>
@@ -285,6 +285,29 @@
                         </a>
                     </div>
                 </section>
+            </div>
+        </section>
+
+        <section class="content-area contact-page-window" id="contact-window" data-page-window data-secondary-window aria-labelledby="contact-window-title" aria-hidden="true">
+            <header class="content-window-titlebar" data-page-window-drag tabindex="0" aria-label="拖动联系方式窗口" data-i18n-aria-label="window.dragContact">
+                <div class="window-title"><span id="contact-window-title" data-i18n="contact.windowTitle">联系方式</span></div>
+                <div class="content-window-tools">
+                    <button class="window-reset" type="button" data-page-window-reset aria-label="还原联系方式窗口位置" data-i18n-aria-label="window.resetContact">↺</button>
+                    <button class="window-close" type="button" data-page-window-close aria-label="关闭联系方式窗口" data-i18n-aria-label="window.closeContact">×</button>
+                </div>
+            </header>
+
+            <div class="content-window-body contact-window-body">
+                <section class="contact-copy" aria-labelledby="contact-message-title">
+                    <h2 id="contact-message-title" data-i18n="contact.heading">呀呼！来信了！</h2>
+                    <p data-i18n="contact.body">我基本上很少会查看社交媒体的私信（除了QQ），因此通过邮件向我提问是最好的方法，欢迎发邮件</p>
+                    <a class="contact-email" href="mailto:1178391318@qq.com"><span data-i18n="contact.emailLead">给我发邮件：</span>1178391318@qq.com</a>
+                </section>
+                <div class="contact-scene" aria-hidden="true">
+                    <img class="contact-scene-layer contact-scene-box" src="assets/icon/box.png" alt="">
+                    <img class="contact-scene-layer contact-scene-letter" src="assets/icon/letter.png" alt="">
+                    <img class="contact-scene-layer contact-scene-man" src="assets/icon/man.png" alt="">
+                </div>
             </div>
         </section>
         </div>
