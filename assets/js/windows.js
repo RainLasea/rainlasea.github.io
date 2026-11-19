@@ -3,111 +3,54 @@
 
     const windowElements = Array.from(document.querySelectorAll('[data-page-window]'));
     const openers = Array.from(document.querySelectorAll('[data-open-page-window]'));
-    const toolButtons = Array.from(document.querySelectorAll('[data-tool-chime]'));
-    if (!windowElements.length) return;
+    const screen = document.querySelector('.computer-screen');
+    const computer = document.querySelector('.computer');
+    if (!screen || !windowElements.length) return;
 
     const states = new WeakMap();
     let topLayer = 30;
     let activeWindow = windowElements[0];
-    let audioContext = null;
-    let audioOutput = null;
-    let lastSoundAt = 0;
-
-    const unlockAudio = () => {
-        const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextConstructor) return null;
-        if (!audioContext) {
-            audioContext = new AudioContextConstructor();
-            audioOutput = audioContext.createGain();
-            audioOutput.gain.value = 0.28;
-            audioOutput.connect(audioContext.destination);
-        }
-        if (audioContext.state === 'suspended') void audioContext.resume().catch(() => {});
-        return audioContext;
-    };
-
-    const canPlaySound = (minimumGap = 45) => {
-        const nowMs = window.performance.now();
-        if (nowMs - lastSoundAt < minimumGap) return false;
-        lastSoundAt = nowMs;
-        return true;
-    };
-
-    const playTone = ({ frequency, frequencyEnd, delay = 0, duration = 0.12, volume = 0.12, type = 'sine' }) => {
-        if (!audioContext || !audioOutput) return;
-
-        const startedAt = audioContext.currentTime + delay;
-        const oscillator = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        oscillator.type = type;
-        oscillator.frequency.setValueAtTime(frequency, startedAt);
-        if (frequencyEnd) oscillator.frequency.exponentialRampToValueAtTime(frequencyEnd, startedAt + duration);
-        gain.gain.setValueAtTime(0.0001, startedAt);
-        gain.gain.exponentialRampToValueAtTime(volume, startedAt + Math.min(0.008, duration / 3));
-        gain.gain.exponentialRampToValueAtTime(0.0001, startedAt + duration);
-        oscillator.connect(gain);
-        gain.connect(audioOutput);
-        oscillator.start(startedAt);
-        oscillator.stop(startedAt + duration + 0.02);
-    };
+    const sounds = new Map(Object.entries({
+        open: ['pop-open', 0.32],
+        close: ['pop-close', 0.28],
+        reset: ['pop-reset', 0.25],
+        drop: ['pop-drop', 0.2],
+        click: ['pop-click', 0.24]
+    }).map(([kind, [name, volume]]) => {
+        const audio = new Audio(`assets/audio/${name}.wav`);
+        audio.preload = 'auto';
+        audio.volume = volume;
+        return [kind, audio];
+    }));
+    let soundEnabled = true;
+    let currentSound = null;
+    const chimeVoices = new Set();
+    const chimeBuffers = new Map();
+    let chimeContext = null;
+    let lastChimeAt = -Infinity;
+    let lastSoundAt = -Infinity;
+    try { soundEnabled = localStorage.getItem('abysslasea-sound') !== 'off'; } catch (_) { /* Settings remain usable without storage. */ }
 
     const playUiSound = (kind) => {
-        unlockAudio();
-        if (!canPlaySound()) return;
-
-        if (kind === 'open') {
-            playTone({ frequency: 523.25, frequencyEnd: 659.25, duration: 0.13, volume: 0.15, type: 'triangle' });
-            playTone({ frequency: 783.99, delay: 0.065, duration: 0.16, volume: 0.1 });
-            return;
-        }
-
-        if (kind === 'close') {
-            playTone({ frequency: 587.33, frequencyEnd: 349.23, duration: 0.16, volume: 0.13, type: 'triangle' });
-            return;
-        }
-
-        if (kind === 'reset') {
-            playTone({ frequency: 392, frequencyEnd: 659.25, duration: 0.1, volume: 0.12, type: 'triangle' });
-            playTone({ frequency: 783.99, delay: 0.075, duration: 0.11, volume: 0.09 });
-            return;
-        }
-
-        if (kind === 'pickup') {
-            playTone({ frequency: 440, frequencyEnd: 554.37, duration: 0.075, volume: 0.07, type: 'triangle' });
-            return;
-        }
-
-        if (kind === 'drop') {
-            playTone({ frequency: 174.61, frequencyEnd: 130.81, duration: 0.11, volume: 0.1, type: 'sine' });
-            playTone({ frequency: 523.25, delay: 0.025, duration: 0.08, volume: 0.045, type: 'triangle' });
-            return;
-        }
-
-        if (kind === 'card') {
-            playTone({ frequency: 659.25, frequencyEnd: 783.99, duration: 0.09, volume: 0.12, type: 'triangle' });
-            playTone({ frequency: 1046.5, delay: 0.055, duration: 0.14, volume: 0.09 });
-            return;
-        }
-
-        playTone({ frequency: 698.46, frequencyEnd: 880, duration: 0.085, volume: 0.1, type: 'triangle' });
+        const audio = sounds.get(kind === 'link' || kind === 'card' ? 'click' : kind);
+        const now = performance.now();
+        if (!audio || !soundEnabled || now - lastSoundAt < 90) return;
+        lastSoundAt = now;
+        currentSound?.pause();
+        audio.currentTime = 0;
+        currentSound = audio;
+        audio.play().catch((error) => {
+            if (error.name !== 'NotAllowedError' && error.name !== 'AbortError') console.warn('UI sound could not play:', error);
+        });
     };
 
-    const playToolChime = (button) => {
-        if (!audioContext || audioContext.state !== 'running' || !canPlaySound(80)) return;
-
-        const baseFrequency = Number(button.dataset.chimeNote) || 659.25;
-        const partials = [
-            { ratio: 1, volume: 0.16, duration: 0.55 },
-            { ratio: 2.01, volume: 0.07, duration: 0.36 },
-            { ratio: 4.12, volume: 0.025, duration: 0.2 }
-        ];
-
-        partials.forEach(({ ratio, volume, duration }) => {
-            playTone({ frequency: baseFrequency * ratio, duration, volume });
-        });
-
-        button.classList.add('is-ringing');
-        window.setTimeout(() => button.classList.remove('is-ringing'), 160);
+    const releaseChime = (voice) => {
+        const time = chimeContext.currentTime;
+        const level = voice.gain.gain.value;
+        voice.gain.gain.cancelScheduledValues(time);
+        voice.gain.gain.setValueAtTime(level, time);
+        voice.gain.gain.linearRampToValueAtTime(0, time + .018);
+        voice.source.stop(time + .025);
     };
 
     const bringToFront = (windowElement) => {
@@ -143,23 +86,19 @@
         state.animationTimer = null;
     };
 
-    const getBaseBounds = (windowElement, state) => {
-        const rect = windowElement.getBoundingClientRect();
-        return {
-            left: rect.left + window.scrollX - state.offsetX,
-            top: rect.top + window.scrollY - state.offsetY,
-            width: rect.width,
-            height: rect.height
-        };
-    };
+    const getBaseBounds = (windowElement) => ({
+        left: windowElement.offsetLeft,
+        top: windowElement.offsetTop,
+        width: windowElement.offsetWidth,
+        height: windowElement.offsetHeight
+    });
 
     const constrainPosition = (nextX, nextY, baseBounds) => {
-        const pageWidth = Math.max(document.documentElement.clientWidth, document.documentElement.scrollWidth);
-        const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-        const minX = -baseBounds.left;
-        const minY = -baseBounds.top;
-        const maxX = Math.max(minX, pageWidth - baseBounds.left - baseBounds.width);
-        const maxY = Math.max(minY, pageHeight - baseBounds.top - baseBounds.height);
+        const inset = 8;
+        const minX = inset - baseBounds.left;
+        const minY = inset - baseBounds.top;
+        const maxX = Math.max(minX, screen.clientWidth - inset - baseBounds.left - baseBounds.width);
+        const maxY = Math.max(minY, screen.clientHeight - inset - baseBounds.top - baseBounds.height);
 
         return {
             x: Math.min(Math.max(nextX, minX), maxX),
@@ -175,6 +114,10 @@
         windowElement.classList.remove('is-opening', 'is-closing');
         windowElement.classList.add('is-open');
         windowElement.setAttribute('aria-hidden', 'false');
+        const position = constrainPosition(state.offsetX, state.offsetY, getBaseBounds(windowElement));
+        state.offsetX = position.x;
+        state.offsetY = position.y;
+        renderPosition(windowElement, state);
         setAnimationOrigin(windowElement, opener);
         void windowElement.offsetWidth;
         windowElement.classList.add('is-opening');
@@ -230,7 +173,7 @@
             const position = constrainPosition(
                 state.offsetX + deltaX,
                 state.offsetY + deltaY,
-                getBaseBounds(windowElement, state)
+                getBaseBounds(windowElement)
             );
             state.offsetX = position.x;
             state.offsetY = position.y;
@@ -246,17 +189,20 @@
             const startY = event.clientY;
             const startOffsetX = state.offsetX;
             const startOffsetY = state.offsetY;
-            const baseBounds = getBaseBounds(windowElement, state);
+            const baseBounds = getBaseBounds(windowElement);
+            const screenRect = screen.getBoundingClientRect();
+            const scaleX = screen.clientWidth / screenRect.width;
+            const scaleY = screen.clientHeight / screenRect.height;
             let hasMoved = false;
             handle.setPointerCapture(event.pointerId);
             windowElement.classList.add('is-dragging');
-            playUiSound('pickup');
+            computer.classList.add('is-window-dragging');
 
             const move = (moveEvent) => {
                 if (Math.abs(moveEvent.clientX - startX) + Math.abs(moveEvent.clientY - startY) > 4) hasMoved = true;
                 const position = constrainPosition(
-                    startOffsetX + moveEvent.clientX - startX,
-                    startOffsetY + moveEvent.clientY - startY,
+                    startOffsetX + (moveEvent.clientX - startX) * scaleX,
+                    startOffsetY + (moveEvent.clientY - startY) * scaleY,
                     baseBounds
                 );
                 state.offsetX = position.x;
@@ -266,6 +212,7 @@
 
             const stop = () => {
                 windowElement.classList.remove('is-dragging');
+                computer.classList.remove('is-window-dragging');
                 if (hasMoved) playUiSound('drop');
                 handle.removeEventListener('pointermove', move);
                 handle.removeEventListener('pointerup', stop);
@@ -316,29 +263,87 @@
         });
     });
 
-    toolButtons.forEach((button) => {
+    document.querySelectorAll('[data-tool-chime]').forEach((button) => {
+        const step = Number(button.dataset.chimeStep);
+        const baseStep = step >= 5 ? 7 : 0;
+        const sample = baseStep === 7 ? 'G' : 'C';
+        const playbackRate = 2 ** ((step - baseStep) / 12);
+        let voice = null;
+        let ringTimer = 0;
+        const playChime = async () => {
+            const now = performance.now();
+            if (!soundEnabled || now - lastChimeAt < 90) return;
+            lastChimeAt = now;
+            try {
+                if (!chimeContext) chimeContext = new AudioContext();
+                await chimeContext.resume();
+                if (!chimeBuffers.has(sample)) {
+                    chimeBuffers.set(sample, fetch(`assets/audio/marimba/${sample}.wav`)
+                        .then((response) => response.arrayBuffer())
+                        .then((data) => chimeContext.decodeAudioData(data)));
+                }
+                const buffer = await chimeBuffers.get(sample);
+                if (voice) releaseChime(voice);
+
+                const source = chimeContext.createBufferSource();
+                const gain = chimeContext.createGain();
+                const time = chimeContext.currentTime;
+                const duration = buffer.duration / playbackRate;
+                source.buffer = buffer;
+                source.playbackRate.value = playbackRate;
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(.2, time + .012);
+                gain.gain.setValueAtTime(.2, time + duration - .18);
+                gain.gain.linearRampToValueAtTime(0, time + duration);
+                source.connect(gain);
+                gain.connect(chimeContext.destination);
+
+                const note = { source, gain };
+                voice = note;
+                chimeVoices.add(note);
+                source.onended = () => {
+                    source.disconnect();
+                    gain.disconnect();
+                    chimeVoices.delete(note);
+                    if (voice === note) voice = null;
+                };
+                source.start(time);
+                button.classList.add('is-ringing');
+                clearTimeout(ringTimer);
+                ringTimer = setTimeout(() => button.classList.remove('is-ringing'), 170);
+            } catch (error) {
+                if (error.name !== 'NotAllowedError' && error.name !== 'AbortError') console.warn('Chime sample could not play:', error);
+            }
+        };
         button.addEventListener('pointerenter', (event) => {
-            if (event.pointerType && event.pointerType !== 'mouse') return;
-            playToolChime(button);
+            if (event.pointerType === 'mouse') playChime();
         });
-        button.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-        });
+        button.addEventListener('click', playChime);
+        button.addEventListener('focus', playChime);
     });
+
+    document.getElementById('languageToggle')?.addEventListener('click', () => playUiSound('click'));
 
     document.addEventListener('keydown', (event) => {
         if (event.key === 'Escape' && activeWindow?.hasAttribute('data-secondary-window')) closeWindow(activeWindow);
     });
 
-    window.addEventListener('resize', () => {
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) return;
+        currentSound?.pause();
+        chimeVoices.forEach(releaseChime);
+    });
+
+    const boundsObserver = new ResizeObserver(() => {
         windowElements.forEach((windowElement) => {
             if (windowElement.getAttribute('aria-hidden') === 'true') return;
             const state = states.get(windowElement);
-            const position = constrainPosition(state.offsetX, state.offsetY, getBaseBounds(windowElement, state));
+            const position = constrainPosition(state.offsetX, state.offsetY, getBaseBounds(windowElement));
             state.offsetX = position.x;
             state.offsetY = position.y;
             renderPosition(windowElement, state);
         });
-    }, { passive: true });
+    });
+    boundsObserver.observe(screen);
+    windowElements.forEach((windowElement) => boundsObserver.observe(windowElement));
 })();
